@@ -199,9 +199,3 @@ class Vertex(object):
     def __str__(self):
         return "Vertex({})".format(self.uid)
     __repr__ = __str__
-
-
-graph = Graph.rrg(11, 4)
-print graph
-for path in graph.k_shortest_paths(7, 2, 5):
-    print path
