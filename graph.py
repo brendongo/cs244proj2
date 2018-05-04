@@ -78,6 +78,9 @@ class Graph(object):
         """
         self._vertices = dict((v.uid, v) for v in vertices)
 
+    def vertices(self):
+        return self._vertices.values()
+
     def k_shortest_paths(self, k, start, end):
         """Returns the k shortest paths between start and end.
 
