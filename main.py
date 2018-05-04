@@ -5,8 +5,8 @@ from collections import Counter
 from tqdm import tqdm
 
 N_VERTICES = 600
-k = 8
-
+k = 64
+np.random.seed(123)
 graph = Graph.rrg(N_VERTICES, 10)
 
 permutation = range(N_VERTICES)
@@ -29,7 +29,7 @@ for vertex in graph._vertices.itervalues():
 for i in tqdm(xrange(N_VERTICES - 1)):
     shortest_paths = graph.k_shortest_paths(
             k, permutation[i], permutation[i + 1])
-    for path in shortest_paths:
+    for path in shortest_paths[:8]:
         for j in xrange(len(path) - 1):
             edge = (path[j], path[j + 1])
             if path[j].uid > path[j + 1].uid:
@@ -44,7 +44,7 @@ for i in tqdm(xrange(N_VERTICES - 1)):
                     edge = (path[j + 1], path[j])
                 ecmp_counts[edge] += 1
 
-    for path in shortest_paths[:64]:
+    for path in shortest_paths:
         if len(path) == len(shortest_paths[0]):
             for j in xrange(len(path) - 1):
                 edge = (path[j], path[j + 1])
