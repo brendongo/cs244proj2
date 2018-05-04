@@ -4,18 +4,13 @@ from graph import Graph
 from collections import Counter
 from tqdm import tqdm
 
-N_VERTICES = 300
-k = 10
+N_VERTICES = 600
+k = 8
 
 graph = Graph.rrg(N_VERTICES, 10)
-print graph
-
-#for path in graph.k_shortest_paths(7, 2, 5):
-#    print path
 
 permutation = range(N_VERTICES)
 np.random.shuffle(permutation)
-print permutation
 
 ksp_counts = Counter()
 ecmp_counts = Counter()
