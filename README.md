@@ -15,3 +15,7 @@ We further implemented Yen's Loopless K-shortest Paths algorithm to obtain the
 k-shortest paths between any two nodes in the generated RRG. We generate 
 random permutation traffic and count the paths through the edges in the graph,
 reproducing Figure 9 from the paper.
+
+# Reproduce
+
+`export PYTHONPATH=root of this repo`
