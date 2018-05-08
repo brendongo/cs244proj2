@@ -10,10 +10,10 @@ class JellyRouting(Routing):
     def get_route(self, src, dst, pkt):
         if src == dst:
             return [src]
+        src = self._topo.id_gen(name=src).dpid
+        dst = self._topo.id_gen(name=dst).dpid
         if src not in self._paths or dst not in self._paths[src]:
             graph = self._topo._graph
-            src = self._topo.id_gen(name=src).dpid
-            dst = self._topo.id_gen(name=dst).dpid
             path = graph.k_shortest_paths(1, src, dst)[0]
             path = [self._topo.id_gen(dpid=x.uid).name_str() for x in path]
             self._paths[src][dst] = path
