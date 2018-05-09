@@ -32,12 +32,19 @@ def buildTopo( topo, topos ):
     return topos[ topo_name ]( *topo_seq_params, **topo_kw_params )
 
 
+def ecmp(paths):
+    return [path for path in paths if len(path) == len(paths[0])]
+
+def identity(paths):
+    return paths
+
 DEF_ROUTING = 'st'
 ROUTING = {
     'st': STStructuredRouting,
     'random': RandomStructuredRouting,
     'hashed': HashedStructuredRouting,
-    'jelly': JellyRouting
+    'ecmp': lambda topo: JellyRouting(topo, ecmp),
+    'shortest_paths': lambda topo: JellyRouting(topo, identity)
 }
 
 def getRouting( routing_type, topo ):

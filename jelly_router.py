@@ -4,8 +4,10 @@ from collections import defaultdict
 
 
 class JellyRouting(Routing):
-    def __init__(self, topo):
+    def __init__(self, topo, path_filter, k=8):
         self._topo = topo
+        self._k = k
+        self._path_filter = path_filter
         self._paths = defaultdict(dict)
 
     def get_route(self, src, dst, pkt):
@@ -21,20 +23,13 @@ class JellyRouting(Routing):
             #paths = [self._topo.id_gen(dpid=x.uid).name_str() for path in paths for x in path]
             #self._paths[src][dst] = paths
 
-            #paths = graph.k_shortest_paths(8, src, dst)
-            #print "Path: {}".format(paths)
-            #paths = [
-            #    [self._topo.id_gen(dpid=x.uid).name_str() for x in path] for path in paths]
-            #self._paths[src][dst] = paths
-
-            path = graph.k_shortest_paths(1, src, dst)[0]
-            print "Path: {}".format(path)
-            path = [self._topo.id_gen(dpid=x.uid).name_str() for x in path]
-            self._paths[src][dst] = path
+            paths = self._path_filter(
+                    graph.k_shortest_paths(self._k, src, dst))
+            paths = [
+                [self._topo.id_gen(dpid=x.uid).name_str() for x in path] for path in paths]
+            self._paths[src][dst] = paths
         else:
             print "Cached"
-        path = self._paths[src][dst]
         print "Self._paths: {}".format(self._paths)
-        #self._paths.clear()
-        return path
-        #return self._paths[src][dst][np.random.randint(len(self._paths[src][dst]))]
+        return self._paths[src][dst][
+                np.random.randint(len(self._paths[src][dst]))]
