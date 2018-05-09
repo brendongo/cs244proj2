@@ -1,3 +1,15 @@
+# Install
+
+`./install.sh`
+`export PYTHONPATH=root of this repo`
+
+# Generate Figure 9
+`python main.py`
+
+# Generate Table 1:
+`./run.sh`
+
+
 # Progress
 
 We have implemented the RRG generation method described in the paper,
@@ -18,4 +30,3 @@ reproducing Figure 9 from the paper.
 
 # Reproduce
 
-`export PYTHONPATH=root of this repo`
