@@ -13,7 +13,7 @@ enumerate up, down, and layer edges.
 
 from graph import Graph
 from mininet.topo import Topo
-from collections import defaultdict
+from collections import defaultdict, Counter
 from tqdm import tqdm
 
 
@@ -478,6 +478,7 @@ class JellyFishTop(StructuredTopo):
         graph = Graph.rrg(NUM_SWITCHES, PORTS_PER_SWITCH - SERVERS_PER_SWITCH)
         print graph
         self._graph = graph
+        ports = Counter()
         host_index = NUM_SWITCHES + 1
         for switch in tqdm(graph.vertices()):
             switch_name = "s{}".format(switch.uid)
@@ -488,13 +489,24 @@ class JellyFishTop(StructuredTopo):
                 host_index += 1
                 server = self.addHost(
                         host_name, **self.def_nopts(self.LAYER_HOST, host_name))
-                self.addLink(server, switch_name, bw=10)
+                sport = ports[host_index]
+                ports[host_index] += 1
+                dport = ports[switch.uid]
+                ports[switch.uid] += 1
+                print "Adding: {} [{}] --> {} [{}]".format(server, sport, switch_name, dport)
+                self.addLink(server, switch_name)
 
-        for switch in tqdm(graph.vertices()):
-            for neighbor in switch.neighbors:
+        for switch in tqdm(sorted(graph.vertices(), key=lambda x: str(x.uid))):
+            for neighbor in sorted(switch.neighbors, key=lambda x: str(x.uid)):
+                #print "Adding {} to {}".format(switch, neighbor)
                 if switch.uid < neighbor.uid:
+                    sport = ports[switch.uid]
+                    ports[switch.uid] += 1
+                    dport = ports[neighbor.uid]
+                    ports[neighbor.uid] += 1
+                    print "Adding: {} [{}] --> {} [{}]".format(switch.uid, sport, neighbor.uid, dport)
                     self.addLink(
-                            "s{}".format(switch.uid), "s{}".format(neighbor.uid), bw=10)
+                            "s{}".format(switch.uid), "s{}".format(neighbor.uid))
 
     def layer(self, name):
         '''Return layer of a node

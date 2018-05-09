@@ -70,8 +70,11 @@ def iperfPairs( clients, servers, experimentName, num_flows=1):
     info( "*** Starting iperf clients\n" )
     for src, dest in plist:
         output_file = "results/iperf_{}_{}_{}_{}".format(experimentName, num_flows, src.name, dest.name)
-        src.sendCmd( "sleep 1; iperf -u -p 5555 -t %s -i .5 -c %s" % (
+        src.sendCmd( "sleep 1; iperf -f M -p 5555 -t %s -i .5 -c %s" % (
             10, dest.IP()) )
+
+        #src.sendCmd( "sleep 1; iperf -f M -p 5555 -t %s -i .5 -c %s > %s" % (
+        #    10, dest.IP(), output_file) )
     info( "*** Waiting for clients to complete\n" )
     results = []
     for src, dest in plist:
@@ -85,15 +88,31 @@ def iperfPairs( clients, servers, experimentName, num_flows=1):
 
 
 def experiment(net):
+    for h in net.hosts:
+        print "disable ipv6"
+        h.cmd("sysctl -w net.ipv6.conf.all.disable_ipv6=1")
+        h.cmd("sysctl -w net.ipv6.conf.default.disable_ipv6=1")
+        h.cmd("sysctl -w net.ipv6.conf.lo.disable_ipv6=1")
+
+    for sw in net.switches:
+        print "disable ipv6"
+        sw.cmd("sysctl -w net.ipv6.conf.all.disable_ipv6=1")
+        sw.cmd("sysctl -w net.ipv6.conf.default.disable_ipv6=1")
+        sw.cmd("sysctl -w net.ipv6.conf.lo.disable_ipv6=1")
+    
     net.start()
     sleep(3)
     #net.pingAll()
-    shuffled = net.hosts[:]
-    np.random.shuffle(shuffled)
-    for i,j in zip(net.hosts, shuffled):
-        print i, j
-    iperfPairs(net.hosts, shuffled, "testExperiment.txt")
-    #CLI(net)
+
+    permutation = net.hosts
+    np.random.shuffle(permutation)
+    srcs = []
+    dsts = []
+    for i in xrange(len(permutation)):
+        srcs.append(permutation[i])
+        dsts.append(permutation[(i + 1) % len(net.hosts)])
+    iperfPairs(srcs, dsts, "ecmp")
+    CLI(net)
     net.stop()
 
 def main():
