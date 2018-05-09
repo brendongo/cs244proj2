@@ -14,3 +14,5 @@ sudo apt-get -y install python-setuptools python-dev build-essential
 sudo easy_install pip 
 
 sudo pip install -r requirements.txt
+
+mkdir results/
