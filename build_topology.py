@@ -70,8 +70,8 @@ def iperfPairs( clients, servers, experimentName, num_flows):
     info( "*** Starting iperf clients\n" )
     for src, dest in plist:
         output_file = "results/iperf_{}_{}_{}_{}".format(experimentName, num_flows, src.name, dest.name)
-        src.sendCmd( "sleep 1; iperf -f M -p 5555 -t %s -i .5 -P %d -c %s > %s" % (
-            10, num_flows, dest.IP(), output_file) )
+        src.sendCmd( "sleep 1; iperf -l %fM -f M -p 5555 -t %s -i .5 -P %d -c %s > %s" % (
+            1/float(num_flows), 10, num_flows, dest.IP(), output_file))
 
         #src.sendCmd( "sleep 1; iperf -f M -p 5555 -t %s -i .5 -c %s > %s" % (
         #    10, dest.IP(), output_file) )
