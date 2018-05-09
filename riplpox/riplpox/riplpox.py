@@ -117,6 +117,15 @@ class RipLController(object):
     self.r = r  # Master Routing object, passed in and reused.
     self.mode = mode # One in MODES.
     self.macTable = {}  # [mac] -> (dpid, port)
+    # If you want to send to dst, then send down self.macTable[dst] dpid, port
+    graph = self.t._graph
+
+    for sw in self._raw_dpids(t.layer_nodes(t.LAYER_EDGE)):
+      sw_name = t.id_gen(dpid = sw).name_str()
+      for host in t.down_nodes(sw_name):
+          host_mac = EthAddr(t.id_gen(name=host).mac_str())
+          sw_port, _ = t.port(sw_name, host)
+          self.macTable[host_mac] = (sw, sw_port)
 
     # TODO: generalize all_switches_up to a more general state machine.
     self.all_switches_up = False  # Sequences event handling.
@@ -244,18 +253,6 @@ class RipLController(object):
     in_port = event.port
     t = self.t
 
-    # Learn MAC address of the sender on every packet-in.
-    self.macTable[packet.src] = (dpid, in_port)
-
-    #log.info("mactable: %s" % self.macTable)
-    print "Packet: {}".format(packet)
-    print "{}".format(packet.find("ipv6"))
-    if packet.find("ipv6") is not None:
-        print packet.find("ipv6").find("icmp6")
-    print "Packet src: {}".format(packet.src)
-    print "Packet dst: {}".format(packet.dst)
-    print "Receiver: {}".format(dpid)
-
     # Insert flow, deliver packet directly to destination.
     if packet.dst in self.macTable:
       out_dpid, out_port = self.macTable[packet.dst]
@@ -354,6 +351,7 @@ class RipLController(object):
       self.switches[out_dpid].send_packet_data(out_port, event.data)
 
     else:
+      assert False
       self._flood(event)
 
   def _handle_PacketIn(self, event):
