@@ -48,7 +48,7 @@ def listening( src, dest, port=5001 ):
 def info(*args):
     print args
 
-def iperfPairs( clients, servers, experimentName, num_flows=1):
+def iperfPairs( clients, servers, experimentName, num_flows):
     "Run iperf semi-simultaneously one way for all pairs"
     pairs = len( clients )
     plist = zip( clients, servers )
@@ -70,8 +70,8 @@ def iperfPairs( clients, servers, experimentName, num_flows=1):
     info( "*** Starting iperf clients\n" )
     for src, dest in plist:
         output_file = "results/iperf_{}_{}_{}_{}".format(experimentName, num_flows, src.name, dest.name)
-        src.sendCmd( "sleep 1; iperf -f M -p 5555 -t %s -i .5 -c %s" % (
-            10, dest.IP()) )
+        src.sendCmd( "sleep 1; iperf -f M -p 5555 -t %s -i .5 -P %d -c %s > %s" % (
+            10, num_flows, dest.IP(), output_file) )
 
         #src.sendCmd( "sleep 1; iperf -f M -p 5555 -t %s -i .5 -c %s > %s" % (
         #    10, dest.IP(), output_file) )
@@ -87,7 +87,7 @@ def iperfPairs( clients, servers, experimentName, num_flows=1):
         output_file.write(result)
 
 
-def experiment(net):
+def experiment(net, experiment_name, num_flows):
     for h in net.hosts:
         print "disable ipv6"
         h.cmd("sysctl -w net.ipv6.conf.all.disable_ipv6=1")
@@ -111,16 +111,18 @@ def experiment(net):
     for i in xrange(len(permutation)):
         srcs.append(permutation[i])
         dsts.append(permutation[(i + 1) % len(net.hosts)])
-    iperfPairs(srcs, dsts, "ecmp")
-    CLI(net)
+    iperfPairs(srcs, dsts, experiment_name, num_flows)
     net.stop()
 
 def main():
+    experiment_name = sys.argv[1]
+    num_flows = int(sys.argv[2])
+    
     topo = JellyFishTop()
     net = Mininet(
             topo=topo, host=CPULimitedHost, link=TCLink,
             controller=lambda name: RemoteController(name, port=6633))
-    experiment(net)
+    experiment(net, experiment_name, num_flows)
 
 if __name__ == "__main__":
     main()

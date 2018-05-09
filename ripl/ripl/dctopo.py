@@ -456,9 +456,9 @@ class JellyFishTop(StructuredTopo):
     LAYER_HOST = 3
 
     def __init__(self):
-        PORTS_PER_SWITCH = 5
+        PORTS_PER_SWITCH = 10
         SERVERS_PER_SWITCH = 2
-        NUM_SWITCHES = 10
+        NUM_SWITCHES = 30
         assert NUM_SWITCHES * SERVERS_PER_SWITCH <= 255
         #host_layer = StructuredNodeSpec(1, 0, 1.0, 1.0, "host")
         #switch_layer = StructuredNodeSpec(0, PORTS_PER_SWITCH)
@@ -476,7 +476,6 @@ class JellyFishTop(StructuredTopo):
         #self.addLink( rightSwitch, rightHost , bw=1000)
 
         graph = Graph.rrg(NUM_SWITCHES, PORTS_PER_SWITCH - SERVERS_PER_SWITCH)
-        print graph
         self._graph = graph
         ports = Counter()
         host_index = NUM_SWITCHES + 1
@@ -493,20 +492,17 @@ class JellyFishTop(StructuredTopo):
                 ports[host_index] += 1
                 dport = ports[switch.uid]
                 ports[switch.uid] += 1
-                print "Adding: {} [{}] --> {} [{}]".format(server, sport, switch_name, dport)
-                self.addLink(server, switch_name)
+                self.addLink(server, switch_name, bw=10)
 
         for switch in tqdm(sorted(graph.vertices(), key=lambda x: str(x.uid))):
             for neighbor in sorted(switch.neighbors, key=lambda x: str(x.uid)):
-                #print "Adding {} to {}".format(switch, neighbor)
                 if switch.uid < neighbor.uid:
                     sport = ports[switch.uid]
                     ports[switch.uid] += 1
                     dport = ports[neighbor.uid]
                     ports[neighbor.uid] += 1
-                    print "Adding: {} [{}] --> {} [{}]".format(switch.uid, sport, neighbor.uid, dport)
                     self.addLink(
-                            "s{}".format(switch.uid), "s{}".format(neighbor.uid))
+                            "s{}".format(switch.uid), "s{}".format(neighbor.uid), bw=10)
 
     def layer(self, name):
         '''Return layer of a node

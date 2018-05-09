@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from graph import Graph
+from ripl.ripl.graph import Graph
 from collections import Counter
 from tqdm import tqdm
 
