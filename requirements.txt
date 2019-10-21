@@ -15,7 +15,7 @@ pylint==1.5.2
 requests==2.9.1
 -e git+https://github.com/brendongo/cs244proj2@1ee00c1acd3fe072a1c56044e331647cc2d6e13a#egg=ripl&subdirectory=ripl
 -e git+https://github.com/brendongo/cs244proj2@1ee00c1acd3fe072a1c56044e331647cc2d6e13a#egg=riplpox&subdirectory=riplpox
-scapy==2.2.0
+scapy==2.4.1
 six==1.10.0
 tqdm==4.23.2
 urllib3==1.13.1
