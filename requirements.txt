@@ -7,7 +7,7 @@ google-compute-engine==2.7.5
 lazy-object-proxy==1.2.1
 logilab-common==1.1.0
 networkx==2.1
-numpy==1.14.3
+numpy==1.22.0
 pexpect==4.0.1
 ptyprocess==0.5
 pyflakes==1.1.0
